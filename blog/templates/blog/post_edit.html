@@ -1,0 +1,22 @@
+{% extends 'blog/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<form method="POST" action="" enctype="multipart/form-data">
+	{% csrf_token %}
+	<fieldset class="form-group">
+		<legend class="border-bottom mb-4">
+			Edit Blog Post
+		</legend>
+		{{form|crispy}}
+		<!-- {{formset.management_form}}
+		{% for f in formset %}
+		{{f.as_p}}
+		{% endfor %} -->
+		
+	</fieldset>
+	<button type="submit" class="btn btn-outline-info">Update</button>
+</form>
+<div class="border-top mt-3">
+	<small>Don't want to Update? <a href="#">Cancel</a></small>
+</div>
+{% endblock %}

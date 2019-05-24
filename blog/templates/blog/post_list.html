@@ -1,0 +1,71 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+{% if request.user.is_authenticated %}
+<div class="row first">
+	<div class="col-sm-12 mb-3">
+		<h4 class="text-center">Welcome {{ user.username }}</h4>
+	</div>
+	<!-- Add from here -->
+	{% for ass in backends.associated %}
+		{% if ass.provider == 'facebook' %}
+		<div class="col-md-6 text-center">
+			<img src="{{ass.extra_data.picture.data.url}}" alt="" width="150" height="150" style="border-radius: 50%">
+		</div>
+		<div class="col-md-6 social-container my-2">                 
+			<p> Signed in via:  {{ ass.provider }} </p>
+			<p> Name:  {{ ass.extra_data.name }} </p>
+			<p> Provider url: <a href="{{ass.extra_data.profile_url}}">link</a></p>
+		</div>
+		{% endif %}
+		<!-- Add from here -->
+		{% if ass.provider == 'instagram' %}
+		<div class="col-md-6 text-center">      
+		    <img src="{{ ass.extra_data.user.profile_picture }}" alt="" width="150" height="150" style="border-radius: 50%">             
+		</div>
+		<div class="col-md-6 social-container my-2">
+			<p>Signed in via: {{ ass.provider }} </p>
+			<p> Name:  {{ ass.extra_data.user.full_name }} </p>
+			<p>Provider url: <a href="https://instagram.com/{{ ass.username }}">link</a></p>
+		</div>
+		{% endif %}
+	{% endfor %}
+</div><br>
+{% endif %}
+
+{% for post in posts %}
+<article class="media content-section">
+{% if post.author.profie.photo %}
+<img class="rounded-circle article-img" src="{{post.author.profile.photo.url}}">
+{% endif %}
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="">Author: {{ post.author }}</a>
+      <small class="text-muted">{{ post.created|date:'F d, Y' }}</small>
+    </div>
+    <h2><a class="article-title" href="{{post.get_absolute_url}}">{{ post.title }}</a></h2>
+    <p class="article-content">{{ post.body| truncatewords:30}}</p>
+  </div>
+</article>
+{% empty%}
+<h3>Sorry! No post found..</h3>
+{% endfor %} 
+
+<ul class="pagination" style="margin-left: 30%" >
+	{% if posts.has_previous %}
+	<li class="page-item"><a href="?page={{posts.previous_page_number}}" class="page-link">&laquo;</a></li>
+	{% endif %}
+    {% for post in posts.paginator.page_range %}
+    	{% if posts.number == post %}
+    	<li class="page-item active"><a href="?page={{post}}" class="page-link">{{post}}</a></li>
+    	{% elif post > posts.number|add:'-3' or post < posts.number|add:'3' %}
+    	<li class="page-item"><a href="?page={{post}}" class="page-link">{{post}}</a></li>
+    	{% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+	<li class="page-item"><a href="?page={{posts.next_page_number}}" class="page-link">&raquo;</a></li>
+	{% endif %}
+</ul>
+
+{% endblock %}
+  
+ 

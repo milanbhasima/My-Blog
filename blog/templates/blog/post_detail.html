@@ -1,0 +1,89 @@
+{% extends 'blog/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<article class="media content-section">
+  <!-- <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}"> -->
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="">Author: {{ post.author }}</a>
+      <small class="text-muted">{{ post.created|date:'F d, Y' }}</small>
+      {% if post.author.profile.photo %}
+      <img class="rounded-circle author-img" src="{{ post.author.profile.photo.url }}">
+      {% endif %}  
+    </div>
+    <h2 class="article-title">{{ post.title }}</h2>
+    {% if post.image  %}
+    <img class="img-thumbnail" src="{{ post.image.url }}">
+    {% endif %}
+    <p class="article-content">{{ post.body }}</p> 
+APP ID: 355986108392774
+  </div>
+</article>
+
+<!-- <div class="row gallery">
+  {% for p in post.images_set.all %}
+    <div class="col-md-3">
+      <img src="{{p.image.url}}" alt="img not found" class="img-thumbnail">
+    </div>
+  {% endfor %} 
+</div> -->
+
+{% include 'blog/likes.html' %}<br>
+
+{% if post.author == request.user %}
+<a href="{% url 'blog:post-update' post.id %}" class="btn btn-outline-success btn-md mb-1">Update</a>
+<a href="{% url 'blog:post-delete' post.id %}" class="btn btn-outline-danger btn-md mb-1">Delete</a>
+{% endif %}
+<hr>
+
+<form method="POST" action="">
+  {% csrf_token %}
+  {{form|crispy}}
+  {% if request.user.is_authenticated %}
+  <input type="submit" value="Submit" class="btn btn-primary">
+  {% else %}
+  <input type="submit" value="Submit" class="btn btn-outline-primary" disabled>
+  {% endif %}
+</form>
+<hr>
+<div class="comment-section">  
+  {{comments.count}}: Comment{{comments|pluralize}}
+  {% for comment in comments %}
+  <blockquote class="blockquote">
+    <p class="mb-0"><small>{{comment.content}}</small></p>
+    <footer class="blockquote-footer"><small>by: <cite title="Source Title">{{comment.user|capfirst}}</cite></small>
+       {% if request.user.is_authenticated %}
+      <button type="button" class="reply-btn btn btn-outline-secondary btn-sm ml-3">Reply</button> 
+      {% else %}
+      <button type="button" class="reply-btn btn btn-outline-secondary btn-sm ml-3" disabled>Reply</button> 
+      {% endif %}
+    </footer>
+    
+  </blockquote>
+
+  <div class="reply-comment container ml-4" style="display: none;">
+    {% for reply in comment.replies.all %}
+    <blockquote class="blockquote">
+      <p class="mb-0"><small>{{reply.content}}</small></p>
+      <footer class="blockquote-footer"><small>by: <cite title="Source Title">{{reply.user|capfirst}}</cite></small></footer>
+     <!--  <a href="#" class="btn btn-outline-secondary">Reply</a> -->
+    </blockquote>
+    {% endfor %}
+    <div class="form-group row">
+      <form method="POST" action="">
+      {% csrf_token %}
+      <input type="hidden" name="comment_id" value="{{comment.id}}">
+      {{form|crispy}}
+      {% if request.user.is_authenticated %}
+      <input type="submit" value="Submit" class="btn btn-primary">
+      {% else %}
+      <input type="submit" value="Submit" class="btn btn-outline-primary" disabled>
+      {% endif %}
+      </form>
+    </div> 
+  </div>
+
+  {% endfor %}
+</div>
+{% endblock %}
+
